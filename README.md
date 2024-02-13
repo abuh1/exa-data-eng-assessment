@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-# exa-data-eng-assessment
-=======
 # Data Engineer - Technical Assesment
 Our tech teams are curious, driven, intelligent, pragmatic, collaborative and open-minded and you should be too. 
 
