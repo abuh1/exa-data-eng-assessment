@@ -1,17 +1,21 @@
-import json
-from collections import Counter
+import os
+import sys
+sys.path.append('Z:\\Documents\\projects\\exa-data-eng-assessment')
+from src.pipeline.extract import extract_data
 
-# path to one json file from the data directory
-json_path = 'data\\Aaron697_Dickens475_8c95253e-8ee8-9ae8-6d40-021d702dc78e.json'
+main_path = os.listdir('..\\data')
+json_paths = ['..\\data\\' + p for p in main_path]
 
-# extract json data
-def extract_data(json_file):
-    with open(json_file, 'r') as f:
-        data = json.load(f)
-        for entry in data['entry']:
-            resource = entry['resource']
-            yield resource
+# create generator for json data
+extracted = extract_data(json_paths)
 
-# select 'patient' entry of the file
-resource = extract_data(json_path)
+# empty list will include all 'resourceType' from all the data
+unique_fields = []
 
+for resource in extracted:
+    if resource['resourceType'] not in unique_fields:
+        unique_fields.append(resource['resourceType'])
+        
+uq = sorted(unique_fields)
+print(uq)
+print(f"\nLength of list: {len(uq)}")
