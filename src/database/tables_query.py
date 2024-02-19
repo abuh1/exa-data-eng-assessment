@@ -1,21 +1,21 @@
-tables = [
-"""CREATE TABLE allergy_intolerances (
+CREATE_TABLES_QUERY = [
+"""CREATE TABLE allergy_intolerance (
   id VARCHAR(45) PRIMARY KEY,
   resource_type VARCHAR(50),
   resource_id VARCHAR(36),
-  clinical_status JSONB,
+  clinical_status_coding JSONB,
   verification_status JSONB,
   type VARCHAR(25),
   category JSONB,
   criticality VARCHAR(25),
-  code_coding JSONB,
   patient_reference VARCHAR(45),
+  code_coding JSONB,
   recorded_date TIMESTAMP WITH TIME ZONE,
-  reaction JSONB
+  reaction JSONB,
+  FOREIGN KEY (patient_reference) REFERENCES patient(id)
 );""",
-"""CREATE TABLE care_plans (
+"""CREATE TABLE care_plan (
   id VARCHAR(45) PRIMARY KEY,
-  request_method VARCHAR(7),
   resource_type VARCHAR(50),
   resource_id VARCHAR(36),
   status VARCHAR(25),
@@ -24,29 +24,31 @@ tables = [
   subject_reference VARCHAR(45),
   encounter_reference VARCHAR(45),
   period_start TIMESTAMP WITH TIME ZONE,
-  period_end TEXT,
+  period_end TIMESTAMP WITH TIME ZONE,
   care_team JSONB,
   addresses JSONB,
-  activity JSONB
+  activity JSONB,
+  FOREIGN KEY (subject_reference) REFERENCES patient(id),
+  FOREIGN KEY (encounter_reference) REFERENCES encounter(id)
+  
 );""",
-"""CREATE TABLE claims (
+"""CREATE TABLE claim (
   id VARCHAR(45) PRIMARY KEY,
-  request_method VARCHAR(7),
   resource_type VARCHAR(50),
   resource_id VARCHAR(36),
   status VARCHAR(25),
   type_coding JSONB,
   use VARCHAR(25),
   patient_reference VARCHAR(45),
-  patient TEXT,
+  patient_display TEXT,
   billable_period_start TIMESTAMP WITH TIME ZONE,
   billable_period_end TIMESTAMP WITH TIME ZONE,
   created TIMESTAMP WITH TIME ZONE,
   provider_reference TEXT,
-  provider TEXT,
+  provider_display TEXT,
   priority_coding JSONB,
   facility_reference TEXT,
-  facility TEXT,
+  facility_display TEXT,
   diagnosis JSONB,
   supporting_info JSONB,
   procedure JSONB,
@@ -54,26 +56,27 @@ tables = [
   insurance JSONB,
   item JSONB,
   total_value TEXT,
-  total_currency VARCHAR(4)
+  total_currency VARCHAR(4),
+  FOREIGN KEY (patient_reference) REFERENCES patient(id)
 );""",
-"""CREATE TABLE conditions (
+"""CREATE TABLE condition (
   id VARCHAR(45) PRIMARY KEY,
-  request_method VARCHAR(7),
   resource_type VARCHAR(50),
   resource_id VARCHAR(36),
-  clinical_status JSONB,
+  clinical_status_coding JSONB,
   verification_status JSONB,
   category JSONB,
   code_coding JSONB,
-  code TEXT,
+  code_text TEXT,
   subject_reference VARCHAR(45),
   encounter_reference VARCHAR(45),
   onset_date_time TIMESTAMP WITH TIME ZONE,
-  recorded_date TIMESTAMP WITH TIME ZONE
+  recorded_date TIMESTAMP WITH TIME ZONE,
+  FOREIGN KEY (subject_reference) REFERENCES patient(id),
+  FOREIGN KEY (encounter_reference) REFERENCES encounter(id)
 );""",
-"""CREATE TABLE devices (
+"""CREATE TABLE device (
   id VARCHAR(45) PRIMARY KEY,
-  request_method VARCHAR(7),
   resource_type VARCHAR(50),
   resource_id VARCHAR(36),
   udi_carrier JSONB,
@@ -85,30 +88,32 @@ tables = [
   serial_number TEXT,
   device_name JSONB,
   type_coding JSONB,
-  patient_reference VARCHAR(45)
+  type_text TEXT,
+  patient_reference VARCHAR(45),
+  FOREIGN KEY (patient_reference) REFERENCES patient(id),
 );""",
-"""CREATE TABLE diagnostic_reports (
+"""CREATE TABLE diagnostic_report (
   id VARCHAR(45) PRIMARY KEY,
-  request_method VARCHAR(7),
   resource_type VARCHAR(50),
   resource_id VARCHAR(36),
   status VARCHAR(25),
   category JSONB,
   code_coding JSONB,
-  code TEXT,
   subject_reference VARCHAR(45),
   encounter_reference VARCHAR(45),
-  effective_date_time TEXT,
-  issued_date_time TEXT,
+  effective_date_time TIMESTAMP WITH TIME ZONE,
+  issued TIMESTAMP WITH TIME ZONE,
   performer JSONB,
   result JSONB,
-  presented_form JSONB
+  presented_form JSONB,
+  FOREIGN KEY (subject_reference) REFERENCES patient(id),
+  FOREIGN KEY (encounter_reference) REFERENCES encounter(id)
 );""",
-"""CREATE TABLE document_references (
+"""CREATE TABLE document_reference (
   id VARCHAR(45) PRIMARY KEY,
-  request_method VARCHAR(7),
   resource_type VARCHAR(50),
   resource_id VARCHAR(36),
+  identifier JSONB,
   status VARCHAR(25),
   type_coding JSONB,
   category JSONB,
@@ -116,17 +121,17 @@ tables = [
   date TIMESTAMP WITH TIME ZONE,
   author JSONB,
   custodian_reference TEXT,
-  custodian TEXT,
+  custodian_display TEXT,
   content JSONB,
   context_encounter JSONB,
   context_period_start TIMESTAMP WITH TIME ZONE,
   context_period_end TIMESTAMP WITH TIME ZONE
 );""",
-"""CREATE TABLE encounters (
+"""CREATE TABLE encounter (
   id VARCHAR(45) PRIMARY KEY,
-  request_method VARCHAR(7),
   resource_type VARCHAR(50),
   resource_id VARCHAR(36),
+  identifier JSONB,
   status VARCHAR(25),
   class_code VARCHAR(10),
   type JSONB,
@@ -137,14 +142,14 @@ tables = [
   period_end TIMESTAMP WITH TIME ZONE,
   reason_code JSONB,
   hospitalization_discharge_disposition_coding JSONB,
-  hospitalization_discharge_disposition TEXT,
+  hospitalization_discharge_disposition_text TEXT,
   location JSONB,
   service_provider_reference TEXT,
-  service_provider TEXT
+  service_provider_display TEXT,
+  FOREIGN KEY (subject_reference) REFERENCES patient(id),
 );""",
-"""CREATE TABLE explanation_of_benefits (
+"""CREATE TABLE explanation_of_benefit (
   id VARCHAR(45) PRIMARY KEY,
-  request_method VARCHAR(7),
   resource_type VARCHAR(50),
   resource_id VARCHAR(36),
   contained JSONB,
@@ -160,7 +165,7 @@ tables = [
   provider_reference TEXT,
   referral_reference TEXT,
   facility_reference TEXT,
-  facility TEXT,
+  facility_display TEXT,
   claim_reference VARCHAR(45),
   outcome TEXT,
   care_team JSONB,
@@ -169,99 +174,107 @@ tables = [
   item JSONB,
   total JSONB,
   payment_amount_value TEXT,
-  payment_amount_currency VARCHAR(4)
+  payment_amount_currency VARCHAR(4),
+  FOREIGN KEY (subject_reference) REFERENCES patient(id)
 );""",
-"""CREATE TABLE imaging_studies (
+"""CREATE TABLE imaging_study (
   id VARCHAR(45) PRIMARY KEY,
-  request_method VARCHAR(7),
   resource_type VARCHAR(50),
   resource_id VARCHAR(36),
   identifier JSONB,
   status VARCHAR(25),
   subject_reference VARCHAR(45),
   encounter_reference VARCHAR(45),
-  started_date_time TEXT,
-  num_series TEXT,
-  num_instances TEXT,
-  procedure JSONB,
+  started TIMESTAMP WITH TIME ZONE,
+  number_of_series TEXT,
+  number_of_instances TEXT,
+  procedure_code JSONB,
   location_reference TEXT,
-  location TEXT,
-  series JSONB
+  location_display TEXT,
+  series JSONB,
+  FOREIGN KEY (subject_reference) REFERENCES patient(id),
+  FOREIGN KEY (encounter_reference) REFERENCES encounter(id)
 );""",
-"""CREATE TABLE immunizations (
+"""CREATE TABLE immunization (
   id VARCHAR(45) PRIMARY KEY,
-  request_method VARCHAR(7),
   resource_type VARCHAR(50),
   resource_id VARCHAR(36),
   status VARCHAR(25),
-  vaccine_code JSONB,
-  vaccine TEXT,
+  vaccine_code_coding JSONB,
+  vaccine_display TEXT,
   patient_reference VARCHAR(45),
   encounter_reference VARCHAR(45),
   occurence_date_time TIMESTAMP WITH TIME ZONE,
   primary_source TEXT,
   location_reference TEXT,
-  location TEXT
+  location_display TEXT,
+  FOREIGN KEY (patient_reference) REFERENCES patient(id),
+  FOREIGN KEY (encounter_reference) REFERENCES encounter(id)
 );""",
-"""CREATE TABLE medications (
+"""CREATE TABLE medication (
   id VARCHAR(45) PRIMARY KEY,
-  request_method VARCHAR(7),
   resource_type VARCHAR(50),
   resource_id VARCHAR(36),
   code_coding JSONB,
+  code_text TEXT,
   status VARCHAR(25)
 );""",
-"""CREATE TABLE medicaiton_administrations (
+"""CREATE TABLE medication_administration (
   id VARCHAR(45) PRIMARY KEY,
-  request_method VARCHAR(7),
   resource_type VARCHAR(50),
   resource_id VARCHAR(36),
-  medication_code JSONB,
-  medication TEXT,
+  medication_codeable_concept_coding JSONB,
+  medication_codeable_concept_text TEXT,
   subject_reference VARCHAR(45),
   context_reference VARCHAR(45),
   effective_date_time TEXT,
   reason_reference JSONB,
   dosage_value TEXT,
-  dosage_rate TEXT
+  dosage_rate TEXT,
+  FOREIGN KEY (subject_reference) REFERENCES patient(id),
+  FOREIGN KEY (context_reference) REFERENCES encounter(id),
+  FOREIGN KEY (reason_reference) REFERENCES condition(id)
 );""",
-"""CREATE TABLE medication_requests (
+"""CREATE TABLE medication_request (
   id VARCHAR(45) PRIMARY KEY,
-  request_method VARCHAR(7),
   resource_type VARCHAR(50),
   resource_id VARCHAR(36),
   status VARCHAR(25),
   intent VARCHAR(25),
-  medication_reference VARCHAR(45),
-  medication_coding JSONB,
-  medication TEXT,
+  medication_reference_reference VARCHAR(45),
+  medication_codeable_concept_coding JSONB,
+  medication_codeable_concept_text TEXT,
   subject_reference VARCHAR(45),
   encounter_reference VARCHAR(45),
   authored_on TIMESTAMP WITH TIME ZONE,
   requester_reference TEXT,
-  requester TEXT,
+  requester_display TEXT,
   reason_reference JSONB,
-  dosage_instruction JSONB
+  dosage_instruction JSONB,
+  FOREIGN KEY (subject_reference) REFERENCES patient(id),
+  FOREIGN KEY (encounter_reference) REFERENCES encounter(id),
+  FOREIGN KEY (medication_reference_reference) REFERENCES medication(id),
+  FOREIGN KEY (reason_reference) REFERENCES condition(id)
 );""",
-"""CREATE TABLE observations (
+"""CREATE TABLE observation (
   id VARCHAR(45) PRIMARY KEY,
-  request_method VARCHAR(7),
   resource_type VARCHAR(50),
   resource_id VARCHAR(36),
   status VARCHAR(25),
   category JSONB,
   code_coding JSONB,
+  code_text TEXT,
   subject_reference VARCHAR(45),
   encounter_reference VARCHAR(45),
   effective_date_time TEXT,
-  issued_date_time TEXT,
+  issued TIMESTAMP WITH TIME ZONE,
   component JSONB,
-  value_code JSONB,
-  value_text TEXT,
-  value TEXT,
-  unit VARCHAR(25)
+  value_quantity_value TEXT,
+  value_quantity_unit TEXT,
+  FOREIGN KEY (subject_reference) REFERENCES patient(id),
+  FOREIGN KEY (encounter_reference) REFERENCES encounter(id)
 );""",
-"""CREATE TABLE patients (
+"""CREATE TABLE patient (
   id VARCHAR(45) PRIMARY KEY,
   resource_type VARCHAR(50),
   resource_id VARCHAR(36),
@@ -272,29 +285,31 @@ tables = [
   gender VARCHAR(10),
   birth_date VARCHAR(10),
   address JSONB,
-  marital_status_text VARCHAR(20),
-  multiple_birth_boolean VARCHAR(5),
+  marital_status_coding JSONB,
+  marital_status_text VARCHAR(5),
+  multiple_birth_boolean BOOLEAN,
   communication JSONB
 );""",
-"""CREATE TABLE procedures (
+"""CREATE TABLE procedure (
   id VARCHAR(45) PRIMARY KEY,
-  request_method VARCHAR(7),
   resource_type VARCHAR(50),
   resource_id VARCHAR(36),
   status VARCHAR(25),
   code_coding JSONB,
-  code TEXT,
+  code_text TEXT,
   subject_reference VARCHAR(45),
   encounter_reference VARCHAR(45),
   performed_period_start TIMESTAMP WITH TIME ZONE,
   performed_period_end TIMESTAMP WITH TIME ZONE,
   location_reference TEXT,
-  location TEXT,
-  reason_reference JSONB
+  location_display TEXT,
+  reason_reference JSONB,
+  FOREIGN KEY (subject_reference) REFERENCES patient(id),
+  FOREIGN KEY (encounter_reference) REFERENCES encounter(id),
+  FOREIGN KEY (reason_reference) REFERENCES condition(id)
 );""",
-"""CREATE TABLE provenances (
+"""CREATE TABLE provenance (
   id VARCHAR(45) PRIMARY KEY,
-  request_method VARCHAR(7),
   resource_type VARCHAR(50),
   resource_id VARCHAR(36),
   target JSONB,
@@ -303,14 +318,14 @@ tables = [
 );""",
 """CREATE TABLE supply_deliveries (
   id VARCHAR(45) PRIMARY KEY,
-  request_method VARCHAR(7),
   resource_type VARCHAR(50),
   resource_id VARCHAR(36),
   patient_reference VARCHAR(45),
   type_coding JSONB,
-  supplied_quantity TEXT,
-  item_code JSONB,
-  item TEXT,
-  occurence_date_time TIMESTAMP WITH TIME ZONE
+  supplied_item_quantity_value TEXT,
+  item_codeable_concept_coding JSONB,
+  item_codeable_concept_text TEXT,
+  occurence_date_time TIMESTAMP WITH TIME ZONE,
+  FOREIGN KEY (patient_reference) REFERENCES patient(id)
 );"""
 ]

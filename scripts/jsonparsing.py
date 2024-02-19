@@ -1,4 +1,5 @@
 import os
+import itertools
 import sys
 sys.path.append('Z:\\Documents\\projects\\exa-data-eng-assessment')
 from src.pipeline.extract import extract_data
@@ -28,13 +29,14 @@ def testgen(d):
         # Also changing 'id' in resource to resource_id to clean up confusion.
         full_url = entry['fullUrl']
         resource = entry['resource']
-        if resource['resourceType'] == 'Patient':
-            # replaces 'id' with 'resource_id' and adds full_url as 'id'
-            try:
-                resource['resource_id'] = resource.pop('id')
-            except KeyError:
-                print("Error: 'id' is undefined")
-            resource['id'] = full_url
+        # replaces 'id' with 'resource_id' and adds full_url as 'id'
+        try:
+            resource['resource_id'] = resource.pop('id')
+        except KeyError:
+            print("Error: 'id' is undefined")
+        resource['id'] = full_url
         yield resource
-
-print(len(list(extracted)))
+        
+# chaining generator function to extend it
+combined_gen = (testgen(d) for d in extracted)
+big_gen = itertools.chain(*combined_gen)
