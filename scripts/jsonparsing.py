@@ -10,12 +10,31 @@ json_paths = ['..\\data\\' + p for p in main_path]
 extracted = extract_data(json_paths)
 
 # empty list will include all 'resourceType' from all the data
-unique_fields = []
+# unique_fields = []
 
-for resource in extracted:
-    if resource['resourceType'] not in unique_fields:
-        unique_fields.append(resource['resourceType'])
+# for resource in extracted:
+#     if resource['resourceType'] not in unique_fields:
+#         unique_fields.append(resource['resourceType'])
         
-uq = sorted(unique_fields)
-print(uq)
-print(f"\nLength of list: {len(uq)}")
+# uq = sorted(unique_fields)
+# print(uq)
+# print(f"\nLength of list: {len(uq)}")
+
+data = next(extracted)
+
+def testgen(d): 
+    for entry in d['entry']:
+        # Adding fullUrl as 'id' in 'patient' resource so it can be used as primary key in the database.
+        # Also changing 'id' in resource to resource_id to clean up confusion.
+        full_url = entry['fullUrl']
+        resource = entry['resource']
+        if resource['resourceType'] == 'Patient':
+            # replaces 'id' with 'resource_id' and adds full_url as 'id'
+            try:
+                resource['resource_id'] = resource.pop('id')
+            except KeyError:
+                print("Error: 'id' is undefined")
+            resource['id'] = full_url
+        yield resource
+
+print(len(list(extracted)))

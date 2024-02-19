@@ -1,7 +1,6 @@
 tables = [
 """CREATE TABLE allergy_intolerances (
   id VARCHAR(45) PRIMARY KEY,
-  request_method VARCHAR(7),
   resource_type VARCHAR(50),
   resource_id VARCHAR(36),
   clinical_status JSONB,
@@ -264,21 +263,17 @@ tables = [
 );""",
 """CREATE TABLE patients (
   id VARCHAR(45) PRIMARY KEY,
-  request_method VARCHAR(7),
   resource_type VARCHAR(50),
   resource_id VARCHAR(36),
   extension JSONB,
   identifier JSONB,
   name JSONB,
-  contact JSONB,
+  telecom JSONB,
   gender VARCHAR(10),
   birth_date VARCHAR(10),
-  deceased_date_time TEXT,
   address JSONB,
-  marital_status_coding JSONB,
-  marital_status VARCHAR(20),
-  multiple_birth VARCHAR(5),
-  multiple_birth_amount VARCHAR(5),
+  marital_status_text VARCHAR(20),
+  multiple_birth_boolean VARCHAR(5),
   communication JSONB
 );""",
 """CREATE TABLE procedures (

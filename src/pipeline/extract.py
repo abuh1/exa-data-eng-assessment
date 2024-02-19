@@ -2,7 +2,8 @@ import json
 
 # Generator function yielding all data for each json file in the directory
 def extract_data(json_files: list):
-    """ Extracts all data from the JSON files in the directory.
+    """ 
+        Extracts all data from the JSON files in the directory.
     
         Parameters:
             json_files (list): List of paths of json files. 
@@ -15,11 +16,8 @@ def extract_data(json_files: list):
         try:
             with open(json_file, 'r', encoding='utf-8') as f:
                 data = json.load(f)
-                for entry in data['entry']:
-                    resource = entry['resource']
-                    yield resource
+                yield data
         except FileNotFoundError:
             print(f"Error: File {json_file} not found")
         except json.JSONDecodeError:
             print(f"Error: Unable to decode JSON in file {json_file}")
-            
