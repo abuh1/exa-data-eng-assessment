@@ -1,23 +1,80 @@
 import itertools
-from extract import extract_data
+import inflection
 
-# Testing purposes
-data = ['data\\Aaron697_Dickens475_8c95253e-8ee8-9ae8-6d40-021d702dc78e.json']
-extracted = extract_data(data)
+from database.connect import DBConnection
 
-# Takes in resource generator and flattens and maps to SQL schema to discard any data that isn't in the schema.
-def transform_data():
-    pass
-
-# Takes in generator yielded from extract function and reproduces a new generator with all 'resource' from all files.
-def combine_all_resources():
-    pass
-
-def grab_resources(data):
+# This function connects to a database with credentials inside 'config.ini'
+def transform_data(extracted_data):
     """
-        Grabs every 'resource' from json data extracted from extract_data.
+        Main transform function. Takes data outputted by 'extract' (generator object containing all patients' data)
+        and flattens the data. Connects to database using config.ini and retrieves column names which then matches
+        the data to the column names and retrieves the data needed.
         
-        Parameters:
+        Args:
+            extracted_data (generator object): Data extracted from json files using 'extract' module.
+        
+    """
+    # Grab all resources from extracted json files.
+    resources_gen = grab_all_resources(extracted_data)
+    
+    # Flatten all resources 
+    resources_list = list(resources_gen)
+    for i, d in enumerate(resources_list):
+        flat = flatten_dict(d)
+        resources_list[i] = flat
+    
+    # Convert all dictionary keys to snake case (to match postgresql column names)
+    for d in resources_list:
+        snake_case_dict = {inflection.underscore(key): value for key, value in d.items()}
+        d.clear()
+        d.update(snake_case_dict)
+    
+    # Grabs each dictionary's corresponding table column names from the database, and discards the items that aren't needed in the table.
+
+# Filters a dictionary to retrieve items matching database table columns
+def filter_dict_entry(data: dict, column_names):
+    filtered_dict = {key: value for key, value in data.items() if key in column_names}
+    return filtered_dict
+
+# Recursive function to flatten nested dictionaries within a single json dictionary
+def flatten_dict(data_dict: dict, parent_key='', seperator='_'):
+    """
+        Flatten a dictionary with nested values.
+    
+        Args:
+            data_dict (dict): Nested dictionary to flatten.
+            parent_key: current parent key for the nested dictionary value.
+            seperator: seperating string for new flattened key.
+            
+        Returns:
+            Flattened version of the input dictionary. 
+    """
+    items = []
+    for k, v in data_dict.items():
+        new_key = parent_key + seperator + k if parent_key else k
+        if isinstance(v, dict):
+            try:
+                items.extend(flatten_dict(v, new_key, seperator=seperator).items())
+            except RecursionError:
+                print("Error: Recursion depth exceeded.")
+                return None
+        else:
+            items.append((new_key, v))
+    return dict(items)    
+    
+# Utilises grab_resources on all json files, yielding a bigger generator with all resources from all patients.
+def grab_all_resources(extracted_data):
+    # Chaining generator function to extend it
+    combined_gen = (generate_resources(d) for d in extracted_data)
+    combined_resources = itertools.chain(*combined_gen)
+    return combined_resources
+
+# This function is just for grabbing all resources from only one json file.
+def generate_resources(data):
+    """
+        Grabs every 'resource' from one patient file.
+        
+        Args:
             data (generator object): input extracted json generator object from extract module.
             
         Yields:
@@ -35,18 +92,168 @@ def grab_resources(data):
             print("Error: 'id' is undefined")
         resource['id'] = full_url
         yield resource
-        
-        
-# Recursive function to flatten nested dictionaries within a single json dictionary
-def flatten_dict(data, parent_key='', seperator='_'):
-    """
-    Flatten a dictionary with nested values.
-    """
-    items = []
-    for k, v in data.items():
-        new_key = parent_key + seperator + k if parent_key else k
-        if isinstance(v, dict):
-            items.extend(flatten_dict(v, new_key, sep=seperator).items())
-        else:
-            items.append((new_key, v))
-    return dict(items)
+
+# Function to retrieve column names from database tables - used in main transform_data method.
+def get_column_names(conn, table_name):
+    with conn.cursor() as cursor:
+        cursor.execute("SELECT column_name FROM information_schema.columns WHERE table_name = %s", (table_name,))
+        columns = [row[0] for row in cursor.fetchall()]
+        return columns
+    
+with DBConnection() as conn:
+    column_names = get_column_names(conn, 'patient')
+    example_dict = {
+      "resourceType": "Patient",
+      "id": "8c95253e-8ee8-9ae8-6d40-021d702dc78e",
+      "meta": {
+        "profile": [ "http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient" ]
+      },
+      "text": {
+        "status": "generated",
+        "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Generated by <a href=\"https://github.com/synthetichealth/synthea\">Synthea</a>.Version identifier: master-branch-latest\n .   Person seed: 8886041252665297312  Population seed: 13235</div>"
+      },
+      "extension": [ {
+        "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-race",
+        "extension": [ {
+          "url": "ombCategory",
+          "valueCoding": {
+            "system": "urn:oid:2.16.840.1.113883.6.238",
+            "code": "2106-3",
+            "display": "White"
+          }
+        }, {
+          "url": "text",
+          "valueString": "White"
+        } ]
+      }, {
+        "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity",
+        "extension": [ {
+          "url": "ombCategory",
+          "valueCoding": {
+            "system": "urn:oid:2.16.840.1.113883.6.238",
+            "code": "2186-5",
+            "display": "Not Hispanic or Latino"
+          }
+        }, {
+          "url": "text",
+          "valueString": "Not Hispanic or Latino"
+        } ]
+      }, {
+        "url": "http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName",
+        "valueString": "Holley125 Champlin946"
+      }, {
+        "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-birthsex",
+        "valueCode": "M"
+      }, {
+        "url": "http://hl7.org/fhir/StructureDefinition/patient-birthPlace",
+        "valueAddress": {
+          "city": "Barnstable",
+          "state": "Massachusetts",
+          "country": "US"
+        }
+      }, {
+        "url": "http://synthetichealth.github.io/synthea/disability-adjusted-life-years",
+        "valueDecimal": 0.05826471038258488
+      }, {
+        "url": "http://synthetichealth.github.io/synthea/quality-adjusted-life-years",
+        "valueDecimal": 52.94173528961741
+      } ],
+      "identifier": [ {
+        "system": "https://github.com/synthetichealth/synthea",
+        "value": "8c95253e-8ee8-9ae8-6d40-021d702dc78e"
+      }, {
+        "type": {
+          "coding": [ {
+            "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+            "code": "MR",
+            "display": "Medical Record Number"
+          } ],
+          "text": "Medical Record Number"
+        },
+        "system": "http://hospital.smarthealthit.org",
+        "value": "8c95253e-8ee8-9ae8-6d40-021d702dc78e"
+      }, {
+        "type": {
+          "coding": [ {
+            "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+            "code": "SS",
+            "display": "Social Security Number"
+          } ],
+          "text": "Social Security Number"
+        },
+        "system": "http://hl7.org/fhir/sid/us-ssn",
+        "value": "999-86-2571"
+      }, {
+        "type": {
+          "coding": [ {
+            "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+            "code": "DL",
+            "display": "Driver's License"
+          } ],
+          "text": "Driver's License"
+        },
+        "system": "urn:oid:2.16.840.1.113883.4.3.25",
+        "value": "S99949530"
+      }, {
+        "type": {
+          "coding": [ {
+            "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+            "code": "PPN",
+            "display": "Passport Number"
+          } ],
+          "text": "Passport Number"
+        },
+        "system": "http://standardhealthrecord.org/fhir/StructureDefinition/passportNumber",
+        "value": "X67249552X"
+      } ],
+      "name": [ {
+        "use": "official",
+        "family": "Dickens475",
+        "given": [ "Aaron697" ],
+        "prefix": [ "Mr." ]
+      } ],
+      "telecom": [ {
+        "system": "phone",
+        "value": "555-152-6034",
+        "use": "home"
+      } ],
+      "gender": "male",
+      "birthDate": "1944-08-28",
+      "deceasedDateTime": "1998-08-15T13:05:53+01:00",
+      "address": [ {
+        "extension": [ {
+          "url": "http://hl7.org/fhir/StructureDefinition/geolocation",
+          "extension": [ {
+            "url": "latitude",
+            "valueDecimal": 42.13509612101196
+          }, {
+            "url": "longitude",
+            "valueDecimal": -71.94977170576706
+          } ]
+        } ],
+        "line": [ "859 Altenwerth Run Unit 88" ],
+        "city": "Charlton",
+        "state": "MA",
+        "country": "US"
+      } ],
+      "maritalStatus": {
+        "coding": [ {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-MaritalStatus",
+          "code": "M",
+          "display": "M"
+        } ],
+        "text": "M"
+      },
+      "communication": [ {
+        "language": {
+          "coding": [ {
+            "system": "urn:ietf:bcp:47",
+            "code": "en-US",
+            "display": "English"
+          } ],
+          "text": "English"
+        }
+      } ]
+    }
+    new_dict = filter_dict_entry(example_dict, column_names)
+    print(new_dict.keys())

@@ -40,3 +40,30 @@ def testgen(d):
 # chaining generator function to extend it
 combined_gen = (testgen(d) for d in extracted)
 big_gen = itertools.chain(*combined_gen)
+
+
+# Recursive function to flatten nested dictionaries within a single json dictionary
+def flatten_dict(data: dict, parent_key='', seperator='_'):
+    """
+        Flatten a dictionary with nested values.
+    
+        Args:
+            data (dict): Nested dictionary to flatten
+            parent_key: 
+            seperator: seperating string for new flattened key
+    """
+    items = []
+    for k, v in data.items():
+        new_key = parent_key + seperator + k if parent_key else k
+        if isinstance(v, dict):
+            try:
+                items.extend(flatten_dict(v, new_key, seperator=seperator).items())
+            except RecursionError:
+                print("Error: Recursion depth exceeded.")
+                return None
+        else:
+            items.append((new_key, v))
+    return dict(items)
+
+one = next(big_gen)
+print(one)

@@ -5,7 +5,7 @@ def extract_data(json_files: list):
     """ 
         Extracts all data from the JSON files in the directory.
     
-        Parameters:
+        Args:
             json_files (list): List of paths of json files. 
         
         Yields:

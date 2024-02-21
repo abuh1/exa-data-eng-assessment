@@ -3,12 +3,12 @@ from configparser import ConfigParser
 
 # Define a context manager for connecting to the database
 class DBConnection:
-    def __init__(self, config_file):
-        self.config_file = config_file
+    def __init__(self):
+        self.config_file = 'config.ini'
 
     def __enter__(self):
         # Read database configuration from config.ini file
-        parser = ConfigParser
+        parser = ConfigParser()
         parser.read(self.config_file)
         
         # Read connection parameters
@@ -19,7 +19,7 @@ class DBConnection:
         port = parser.get('postgresql', 'port')
         
         # Establish a connection to the database
-        self.conn = psycopg2.connnect(
+        self.conn = psycopg2.connect(
             dbname=dbname,
             user=user,
             password=password,
@@ -33,5 +33,7 @@ class DBConnection:
         if self.conn:
             self.conn.close()
         # Error handling
-        if exc_type is not None:
-            print(f"Exception occurred: {exc_type}, {exc_value}")
+        if exc_type:
+            print(f"Exception {exc_type} occurred with value: {exc_value}")
+        if traceback:
+            print(f"Traceback: {traceback}")

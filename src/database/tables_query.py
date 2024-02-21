@@ -1,4 +1,57 @@
 CREATE_TABLES_QUERY = [
+"""CREATE TABLE patient (
+  id VARCHAR(45) PRIMARY KEY,
+  resource_type VARCHAR(50),
+  resource_id VARCHAR(36),
+  extension JSONB,
+  identifier JSONB,
+  name JSONB,
+  telecom JSONB,
+  gender VARCHAR(10),
+  birth_date VARCHAR(10),
+  address JSONB,
+  marital_status_coding JSONB,
+  marital_status_text VARCHAR(5),
+  multiple_birth_boolean BOOLEAN,
+  communication JSONB
+  );""",
+"""CREATE TABLE encounter (
+  id VARCHAR(45) PRIMARY KEY,
+  resource_type VARCHAR(50),
+  resource_id VARCHAR(36),
+  identifier JSONB,
+  status VARCHAR(25),
+  class_code VARCHAR(10),
+  type JSONB,
+  subject_reference VARCHAR(45),
+  subject TEXT,
+  participant JSONB,
+  period_start TIMESTAMP WITH TIME ZONE,
+  period_end TIMESTAMP WITH TIME ZONE,
+  reason_code JSONB,
+  hospitalization_discharge_disposition_coding JSONB,
+  hospitalization_discharge_disposition_text TEXT,
+  location JSONB,
+  service_provider_reference TEXT,
+  service_provider_display TEXT,
+  FOREIGN KEY (subject_reference) REFERENCES patient(id)
+);""",
+"""CREATE TABLE condition (
+  id VARCHAR(45) PRIMARY KEY,
+  resource_type VARCHAR(50),
+  resource_id VARCHAR(36),
+  clinical_status_coding JSONB,
+  verification_status JSONB,
+  category JSONB,
+  code_coding JSONB,
+  code_text TEXT,
+  subject_reference VARCHAR(45),
+  encounter_reference VARCHAR(45),
+  onset_date_time TIMESTAMP WITH TIME ZONE,
+  recorded_date TIMESTAMP WITH TIME ZONE,
+  FOREIGN KEY (subject_reference) REFERENCES patient(id),
+  FOREIGN KEY (encounter_reference) REFERENCES encounter(id)
+);""",
 """CREATE TABLE allergy_intolerance (
   id VARCHAR(45) PRIMARY KEY,
   resource_type VARCHAR(50),
@@ -30,7 +83,6 @@ CREATE_TABLES_QUERY = [
   activity JSONB,
   FOREIGN KEY (subject_reference) REFERENCES patient(id),
   FOREIGN KEY (encounter_reference) REFERENCES encounter(id)
-  
 );""",
 """CREATE TABLE claim (
   id VARCHAR(45) PRIMARY KEY,
@@ -59,22 +111,6 @@ CREATE_TABLES_QUERY = [
   total_currency VARCHAR(4),
   FOREIGN KEY (patient_reference) REFERENCES patient(id)
 );""",
-"""CREATE TABLE condition (
-  id VARCHAR(45) PRIMARY KEY,
-  resource_type VARCHAR(50),
-  resource_id VARCHAR(36),
-  clinical_status_coding JSONB,
-  verification_status JSONB,
-  category JSONB,
-  code_coding JSONB,
-  code_text TEXT,
-  subject_reference VARCHAR(45),
-  encounter_reference VARCHAR(45),
-  onset_date_time TIMESTAMP WITH TIME ZONE,
-  recorded_date TIMESTAMP WITH TIME ZONE,
-  FOREIGN KEY (subject_reference) REFERENCES patient(id),
-  FOREIGN KEY (encounter_reference) REFERENCES encounter(id)
-);""",
 """CREATE TABLE device (
   id VARCHAR(45) PRIMARY KEY,
   resource_type VARCHAR(50),
@@ -90,7 +126,7 @@ CREATE_TABLES_QUERY = [
   type_coding JSONB,
   type_text TEXT,
   patient_reference VARCHAR(45),
-  FOREIGN KEY (patient_reference) REFERENCES patient(id),
+  FOREIGN KEY (patient_reference) REFERENCES patient(id)
 );""",
 """CREATE TABLE diagnostic_report (
   id VARCHAR(45) PRIMARY KEY,
@@ -127,27 +163,6 @@ CREATE_TABLES_QUERY = [
   context_period_start TIMESTAMP WITH TIME ZONE,
   context_period_end TIMESTAMP WITH TIME ZONE
 );""",
-"""CREATE TABLE encounter (
-  id VARCHAR(45) PRIMARY KEY,
-  resource_type VARCHAR(50),
-  resource_id VARCHAR(36),
-  identifier JSONB,
-  status VARCHAR(25),
-  class_code VARCHAR(10),
-  type JSONB,
-  subject_reference VARCHAR(45),
-  subject TEXT,
-  participant JSONB,
-  period_start TIMESTAMP WITH TIME ZONE,
-  period_end TIMESTAMP WITH TIME ZONE,
-  reason_code JSONB,
-  hospitalization_discharge_disposition_coding JSONB,
-  hospitalization_discharge_disposition_text TEXT,
-  location JSONB,
-  service_provider_reference TEXT,
-  service_provider_display TEXT,
-  FOREIGN KEY (subject_reference) REFERENCES patient(id),
-);""",
 """CREATE TABLE explanation_of_benefit (
   id VARCHAR(45) PRIMARY KEY,
   resource_type VARCHAR(50),
@@ -175,7 +190,7 @@ CREATE_TABLES_QUERY = [
   total JSONB,
   payment_amount_value TEXT,
   payment_amount_currency VARCHAR(4),
-  FOREIGN KEY (subject_reference) REFERENCES patient(id)
+  FOREIGN KEY (patient_reference) REFERENCES patient(id)
 );""",
 """CREATE TABLE imaging_study (
   id VARCHAR(45) PRIMARY KEY,
@@ -228,12 +243,12 @@ CREATE_TABLES_QUERY = [
   subject_reference VARCHAR(45),
   context_reference VARCHAR(45),
   effective_date_time TEXT,
-  reason_reference JSONB,
+  reason_reference_reference VARCHAR(45),
   dosage_value TEXT,
   dosage_rate TEXT,
   FOREIGN KEY (subject_reference) REFERENCES patient(id),
   FOREIGN KEY (context_reference) REFERENCES encounter(id),
-  FOREIGN KEY (reason_reference) REFERENCES condition(id)
+  FOREIGN KEY (reason_reference_reference) REFERENCES condition(id)
 );""",
 """CREATE TABLE medication_request (
   id VARCHAR(45) PRIMARY KEY,
@@ -249,12 +264,12 @@ CREATE_TABLES_QUERY = [
   authored_on TIMESTAMP WITH TIME ZONE,
   requester_reference TEXT,
   requester_display TEXT,
-  reason_reference JSONB,
+  reason_reference_reference VARCHAR(45),
   dosage_instruction JSONB,
   FOREIGN KEY (subject_reference) REFERENCES patient(id),
   FOREIGN KEY (encounter_reference) REFERENCES encounter(id),
   FOREIGN KEY (medication_reference_reference) REFERENCES medication(id),
-  FOREIGN KEY (reason_reference) REFERENCES condition(id)
+  FOREIGN KEY (reason_reference_reference) REFERENCES condition(id)
 );""",
 """CREATE TABLE observation (
   id VARCHAR(45) PRIMARY KEY,
@@ -274,22 +289,6 @@ CREATE_TABLES_QUERY = [
   FOREIGN KEY (subject_reference) REFERENCES patient(id),
   FOREIGN KEY (encounter_reference) REFERENCES encounter(id)
 );""",
-"""CREATE TABLE patient (
-  id VARCHAR(45) PRIMARY KEY,
-  resource_type VARCHAR(50),
-  resource_id VARCHAR(36),
-  extension JSONB,
-  identifier JSONB,
-  name JSONB,
-  telecom JSONB,
-  gender VARCHAR(10),
-  birth_date VARCHAR(10),
-  address JSONB,
-  marital_status_coding JSONB,
-  marital_status_text VARCHAR(5),
-  multiple_birth_boolean BOOLEAN,
-  communication JSONB
-);""",
 """CREATE TABLE procedure (
   id VARCHAR(45) PRIMARY KEY,
   resource_type VARCHAR(50),
@@ -303,10 +302,10 @@ CREATE_TABLES_QUERY = [
   performed_period_end TIMESTAMP WITH TIME ZONE,
   location_reference TEXT,
   location_display TEXT,
-  reason_reference JSONB,
+  reason_reference_reference VARCHAR(45),
   FOREIGN KEY (subject_reference) REFERENCES patient(id),
   FOREIGN KEY (encounter_reference) REFERENCES encounter(id),
-  FOREIGN KEY (reason_reference) REFERENCES condition(id)
+  FOREIGN KEY (reason_reference_reference) REFERENCES condition(id)
 );""",
 """CREATE TABLE provenance (
   id VARCHAR(45) PRIMARY KEY,
