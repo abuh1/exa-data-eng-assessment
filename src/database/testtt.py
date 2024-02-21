@@ -1,0 +1,4 @@
+from database.execute_queries import execute_queries
+from database.tables_query import CREATE_TABLES_QUERY
+
+execute_queries(CREATE_TABLES_QUERY)
