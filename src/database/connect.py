@@ -19,14 +19,17 @@ class DBConnection:
         port = parser.get('postgresql', 'port')
         
         # Establish a connection to the database
-        self.conn = psycopg2.connect(
-            dbname=dbname,
-            user=user,
-            password=password,
-            host=host,
-            port=port
-        )
-        return self.conn
+        try:
+            self.conn = psycopg2.connect(
+                dbname=dbname,
+                user=user,
+                password=password,
+                host=host,
+                port=port
+            )
+            return self.conn
+        except psycopg2.Error as e:
+            print(f"Error connecting to the database: {e}")
     
     # Ensures connection closes when done
     def __exit__(self, exc_type, exc_value, traceback):

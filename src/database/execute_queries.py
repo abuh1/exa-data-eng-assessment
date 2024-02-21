@@ -1,6 +1,6 @@
 import psycopg2
 
-from .connect import DBConnection
+from src.database.connect import DBConnection
 
 def execute_queries(queries: list):
     """
