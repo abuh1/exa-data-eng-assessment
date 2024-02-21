@@ -1,8 +1,8 @@
 import psycopg2
 
-from connect import DBConnection
+from .connect import DBConnection
 
-def execute_queries(queries: list, config_file_path):
+def execute_queries(queries: list):
     """
         Function that connects to postgresql database using the config.ini file and executes queries passed as a parameter.
         
@@ -10,7 +10,7 @@ def execute_queries(queries: list, config_file_path):
             queries (list): list of SQL queries to execute
     """
     try:
-        with DBConnection(config_file=config_file_path) as conn:
+        with DBConnection() as conn:
             cursor = conn.cursor()
             # Execute each query in the list
             for query in queries:
