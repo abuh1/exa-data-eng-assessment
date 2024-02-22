@@ -83,35 +83,22 @@ Ensure you have conda installed before following the steps:
 
 ## 3) Running with Docker Compose
 
-This method creates a container for both the pipeline and the database:
+Replace the following in the docker-compose.yml file: 'your/path/to/data' with your path to your own data.
 
-1. Clone the repository to your local machine (if you haven't already):
-
-    ```bash
-    git clone https://github.com/your-username/fhir-data-etl-pipeline.git
-    ```
-
-2. Navigate to the project directory:
+- Navigate to the directory containing the repo and run:
 
     ```bash
-    cd fhir-data-etl-pipeline
+    $ docker-compose up
     ```
 
-3. Run Docker Compose to build and start the containers:
+- To take down the containers use CTRL+C to exit command line and then enter:
 
     ```bash
-    docker-compose up
+    $ docker-compose down
     ```
 
-## Contributors
+- To delete volumes
 
-- John Doe (@johndoe)
-- Jane Smith (@janesmith)
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-Special thanks to the FHIR community and the contributors to the libraries and tools used in this project.
+    ```bash
+    $ docker-compose down --volumes
+    ```
