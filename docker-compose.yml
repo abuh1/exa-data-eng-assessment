@@ -5,7 +5,7 @@ services:
     image: postgres
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_PASSWORD: password
       POSTGRES_DB: postgres
     ports: 
       - '5432:5432'
@@ -16,15 +16,18 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-  app:
-    image: abuhamza1/etl-fhir
+  etl-fhir:
+    image: abuhamza1/etl-fhir:1.0
     depends_on:
       db:
         condition: service_healthy
-    command: --host=db --port=5432 --user=postgres --password=postgrespassword
+    environment:
+      - DB_USER=postgres
+      - DB_PASS=password
+      - DB_NAME=
+      - DB_HOST=db
+      - DB_PORT=5432
     volumes:
-      - 'logs:/etl-fhird/logs'
-      - 'path/to/data/directory:/etl-fhir/data'
+      - 'Z:\Documents\projects\exa-data-eng-assessment\test_data:/etl-fhir/data'
 volumes:
   db_data:
-  logs:
