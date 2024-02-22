@@ -1,4 +1,4 @@
-CREATE_TABLES_QUERY = [
+create_tables_query = [
 """CREATE TABLE patient (
   id VARCHAR(45) PRIMARY KEY,
   resource_type VARCHAR(50),

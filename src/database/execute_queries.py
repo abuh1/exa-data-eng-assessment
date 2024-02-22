@@ -14,7 +14,6 @@ def execute_queries(conn: psycopg2.extensions.connection, queries: list):
                 cursor.execute(query)
             # Commit the transaction
             conn.commit()
-        print("Queries executed successfully!")    
     except (psycopg2.DatabaseError) as error:
         print("Error executing queries:", error)
         

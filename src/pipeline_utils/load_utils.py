@@ -3,12 +3,13 @@ import csv
 from io import StringIO
 
 from src.database.connect import dbconnection
-from src.config import PSQL_CREDENTIALS
+from src.config import psql_credentials
 
 # Changed data to format suitable for loading, then loads using COPY method from postgres
 def load_to_postgres(data: list):
     # Connect to database
-    with dbconnection(PSQL_CREDENTIALS) as conn:
+    with dbconnection(psql_credentials) as conn:
+        print("Connected to server...")
         cursor = conn.cursor()
         try:
             # Group data by table name
@@ -52,6 +53,9 @@ def load_to_postgres(data: list):
         except Exception as e:
             conn.rollback()
             print(f"Error loading data into table {table_name}: {e}")
+            
+        print("Connection closed.")
+    
 
 # Function to group table data; returns dictionary
 def group_table_data(data):
