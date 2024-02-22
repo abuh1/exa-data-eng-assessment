@@ -17,25 +17,25 @@ To run the pipeline using pip, follow these steps:
 1. Clone the repository to your local machine:
 
     ```bash
-    git clone https://github.com/abuh1/exa-data-eng-assessment.git
+    $ git clone https://github.com/abuh1/exa-data-eng-assessment.git
     ```
 
 2. Navigate to the project directory:
 
     ```bash
-    cd exa-data-eng-assessment
+    $ cd exa-data-eng-assessment
     ```
 
 3. Install dependencies using pip:
 
     ```bash
-    pip install -r requirements.txt
+    $ pip install -r requirements.txt
     ```
 
 4. Run the ETL pipeline:
 
     ```bash
-    python src
+    $ python src
     ```
 
     Alternatively, if you're on windows you can run the run.bat file:
