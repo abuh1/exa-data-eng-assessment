@@ -10,9 +10,9 @@ Before running the pipeline, ensure that you have the following prerequisites in
 - Python 3.x
 - Docker (if using Docker Compose)
 
-## Running with pip
+## Running using pip
 
-To run the pipeline using pip, follow these steps:
+To run the program after using pip to install the dependencies:
 
 - Clone the repository to your local machine:
 
@@ -38,44 +38,44 @@ To run the pipeline using pip, follow these steps:
     $ python src
     ```
 
-    Alternatively, if you're on windows you can run the run.bat file:
+  Alternatively, if you're on windows you can run the run.bat file:
 
    ```bash
     run.bat
     ```
 
-### 2) Running with conda
+## 2) Running with conda
 
-To run the pipeline using conda, follow these steps:
+Ensure you have conda installed before following the steps:
 
-1. Clone the repository to your local machine (if you haven't already):
+- Clone the repository to your local machine (if you haven't already):
 
     ```bash
-    git clone https://github.com/your-username/fhir-data-etl-pipeline.git
+    $ git clone https://github.com/abuh1/exa-data-eng-assessment.git
     ```
 
-2. Navigate to the project directory:
+- Navigate to the project directory:
 
     ```bash
-    cd fhir-data-etl-pipeline
+    $ cd exa-data-eng-assessment
     ```
 
-3. Create a conda environment from the provided environment file:
+3. Create a conda environment from the provided environment file. Type the name of your desired environment in place of <env>:
 
     ```bash
-    conda env create -f condaenv.yml
+    $ conda create --name <env> --file environment.yml
     ```
 
-4. Activate the conda environment:
+4. Activate the conda environment using your environment name:
 
     ```bash
-    conda activate fhir-etl
+    $ conda activate <env>
     ```
 
 5. Run the ETL pipeline:
 
     ```bash
-    python etl_pipeline.py
+    $ python src
     ```
 
 ### 3) Running with Docker Compose
