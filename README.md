@@ -3,14 +3,14 @@
 A pipeline to process FHIR data through ETL processes and load into a PostgreSQL database.  
 
 
-## Prerequisites  
+### Prerequisites  
 
 Before running the pipeline, ensure that you have the following prerequisites installed on your system:
 
 - Python 3.x
 - Docker (if using Docker Compose)
 
-### 1) Running with pip
+## Running with pip
 
 To run the pipeline using pip, follow these steps:
 
