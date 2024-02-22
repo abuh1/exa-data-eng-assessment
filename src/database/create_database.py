@@ -1,0 +1,3 @@
+CREATE_DATABASE_QUERY = [
+"CREATE DATABASE health_resources;"
+]
