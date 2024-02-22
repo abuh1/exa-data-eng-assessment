@@ -105,8 +105,11 @@ Replace the following in the docker-compose.yml file: 'your/path/to/data' with y
 
   ## Without docker
 
-    ![TerminalSS](/demo/program.png)
+    ![TerminalSS](/demo/program.png)  
 
   ## With docker-compose
 
-    ![TerminalSS](/demo/docker-compose.png)
+    ![Dockercompose](/demo/docker-compose.png)
+  
+  ## Database
+    ![Database](/demo/database.png)
