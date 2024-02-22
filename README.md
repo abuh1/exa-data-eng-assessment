@@ -102,3 +102,7 @@ Replace the following in the docker-compose.yml file: 'your/path/to/data' with y
     ```bash
     $ docker-compose down --volumes
     ```
+
+  ## Without docker
+
+    ![TerminalSS](/demo/program.png)
