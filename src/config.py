@@ -14,4 +14,4 @@ for key in psql_credentials:
         psql_credentials[key] = env_var_value
 
 # Data path
-PATH_TO_DATA = 'Z:\\Documents\\projects\\exa-data-eng-assessment\\test_data'
+PATH_TO_DATA = 'your/path/to/data'

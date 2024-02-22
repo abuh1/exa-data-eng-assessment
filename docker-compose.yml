@@ -28,6 +28,6 @@ services:
       - DB_HOST=db
       - DB_PORT=5432
     volumes:
-      - 'Z:\Documents\projects\exa-data-eng-assessment\test_data:/etl-fhir/data'
+      - 'your/path/to/data:/etl-fhir/data'
 volumes:
   db_data:
