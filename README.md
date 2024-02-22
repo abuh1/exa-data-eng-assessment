@@ -1,37 +1,115 @@
-# Data Engineer - Technical Assesment
-Our tech teams are curious, driven, intelligent, pragmatic, collaborative and open-minded and you should be too. 
+# FHIR Data ETL Pipeline
 
-## Testing Goals
-We are testing your ability to design and prototype a scalable data-pipeline (with code) underpinned with good data/software engineering principles from a blank canvas. You will need to use your intellect, creativity, judgement and be comfortable making decisions to produce a solution. 
-
-You will have approximately 1 week to complete this task but can as much or as little time as you deem necessary to **demonstrate your understanding of the problem, your range of skills and approach to problem solving**.
-
-Some successful candidates have spent as little as 3 hours whilst others have used the full week because they've enjoyed exploring different ideas, technologies and approaches. 
-
-## The Task
-An external system / supplier is sending patient data to our platform using the FHIR standard. Our analytics teams find this format difficult to work with when creating dashboards and visualizations. You are required to tranform these FHIR messages into a more workable format preferably in a tabular format. Include any documentation / commentary you deem necessary.
+A pipeline to process FHIR data through ETL processes and load into a PostgreSQL database.  
 
 
-## The Solution
-If you are applying for a position that uses one specific programming language, please write your solution in that language, otherwise your solution can use any of the following technologies along with **any frameworks, libraries you feel appropriate**:
+### Prerequisites  
 
-- **Programming Languages** - Java / Python / Scala / Go / C#
-- **Data Storage Layer** - MongoDB / MySql / Postgres / SQLServer Express / Filesystem (CSV/Parquet/Orc)
+Before running the pipeline, ensure that you have the following prerequisites installed on your system:
 
-Containerising your pipeline using docker / docker-compose is strongly encouraged, but not required.
+- Python 3.x
+- Docker (if using Docker Compose)
 
-## Evaluation
-We take into account 5 areas when evaluating a solution. Each criteria is evaluated from 0 (non-existent) to 5 (excellent) and your final score would be a simple average across all 5 areas. These are:
+## Running using pip
 
-- **Functionality**: Is the solution correct? Does it run in a decent amount of time? How well thought and architected is the solution?
-- **Good Practices**: Does the code follow standard practices for the language and framework used? Take into account reusability, names, function length, structure, how crendentials are handled, etc.
-- **Testing**: Unit and integration tests.
-- **Execution environment**: Container, Virtual Environment, Dependency Management, Isolation, Ease of transition into a production environment etc.
-- **Documentation**: How to install and run the solution? How to see and use the results? What is the architecture? Any next steps?
+After cloning the repo, be sure to replace the database credentials inside src/config.py inside the postgresql_credentials dictionary to your own.
+Make sure to change the PATH_TO_DATA in the same config.py file to your path to the data.
 
-## Context
-[FHIR](/https://www.hl7.org/fhir/overview.html) is a popular standard within healthcare used by healthcare systems to exchange data and represent details of paitents in a standardised way. Some sample FHIR data has been generated in the data directory using a tool called [synthea](https://www.hl7.org/fhir/overview.html). 
+- Clone the repository to your local machine:
 
-## Submit your solution	
-Create a public Github repository and push your solution including any documentation you feel necessary. Commit often - we would rather see a history of trial and error than a single monolithic push. When you're finished, please send us the URL to the repository. 
->>>>>>> 7e1dab7da9092ccfb4dccc140e835193137bbee3
+    ```bash
+    $ git clone https://github.com/abuh1/exa-data-eng-assessment.git
+    ```
+
+- Navigate to the project directory:
+
+    ```bash
+    $ cd exa-data-eng-assessment
+    ```
+
+- Install dependencies using pip:
+
+    ```bash
+    $ pip install -r requirements.txt
+    ```
+
+- Run the ETL pipeline:
+
+    ```bash
+    $ python src
+    ```
+
+  Alternatively, if you're on windows you can run the run.bat file:
+
+   ```bash
+    run.bat
+    ```
+
+## 2) Running with conda
+
+After cloning the repo, be sure to replace the database credentials inside src/config.py inside the postgresql_credentials dictionary to your own.
+Make sure to change the PATH_TO_DATA in the same config.py file to your path to the data.
+Ensure you have conda installed before following the steps:
+
+- Clone the repository to your local machine (if you haven't already):
+
+    ```bash
+    $ git clone https://github.com/abuh1/exa-data-eng-assessment.git
+    ```
+
+- Navigate to the project directory:
+
+    ```bash
+    $ cd exa-data-eng-assessment
+    ```
+
+- Create a conda environment from the provided environment file. Type the name of your desired environment in place of <env>:
+
+    ```bash
+    $ conda create --name <env> --file environment.yml
+    ```
+
+- Activate the conda environment using your environment name:
+
+    ```bash
+    $ conda activate <env>
+    ```
+
+- Run the ETL pipeline:
+
+    ```bash
+    $ python src
+    ```
+
+## 3) Running with Docker Compose
+
+Replace the following in the docker-compose.yml file: 'your/path/to/data' with your path to your own data.
+
+- Navigate to the directory containing the repo and run:
+
+    ```bash
+    $ docker-compose up
+    ```
+
+- To take down the containers use CTRL+C to exit command line and then enter:
+
+    ```bash
+    $ docker-compose down
+    ```
+
+- To delete volumes
+
+    ```bash
+    $ docker-compose down --volumes
+    ```
+
+  ## Without docker
+
+    ![TerminalSS](/demo/program.png)  
+
+  ## With docker-compose
+
+    ![Dockercompose](/demo/docker-compose.png)
+  
+  ## Database
+    ![Database](/demo/database.png)
