@@ -12,7 +12,8 @@ Before running the pipeline, ensure that you have the following prerequisites in
 
 ## Running using pip
 
-To run the program after using pip to install the dependencies:
+After cloning the repo, be sure to replace the database credentials inside src/config.py inside the postgresql_credentials dictionary to your own.
+Make sure to change the PATH_TO_DATA in the same config.py file to your path to the data.
 
 - Clone the repository to your local machine:
 
@@ -46,6 +47,8 @@ To run the program after using pip to install the dependencies:
 
 ## 2) Running with conda
 
+After cloning the repo, be sure to replace the database credentials inside src/config.py inside the postgresql_credentials dictionary to your own.
+Make sure to change the PATH_TO_DATA in the same config.py file to your path to the data.
 Ensure you have conda installed before following the steps:
 
 - Clone the repository to your local machine (if you haven't already):
@@ -60,27 +63,27 @@ Ensure you have conda installed before following the steps:
     $ cd exa-data-eng-assessment
     ```
 
-3. Create a conda environment from the provided environment file. Type the name of your desired environment in place of <env>:
+- Create a conda environment from the provided environment file. Type the name of your desired environment in place of <env>:
 
     ```bash
     $ conda create --name <env> --file environment.yml
     ```
 
-4. Activate the conda environment using your environment name:
+- Activate the conda environment using your environment name:
 
     ```bash
     $ conda activate <env>
     ```
 
-5. Run the ETL pipeline:
+- Run the ETL pipeline:
 
     ```bash
     $ python src
     ```
 
-### 3) Running with Docker Compose
+## 3) Running with Docker Compose
 
-To run the pipeline using Docker Compose, follow these steps:
+This method creates a container for both the pipeline and the database:
 
 1. Clone the repository to your local machine (if you haven't already):
 
