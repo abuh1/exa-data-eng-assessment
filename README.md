@@ -3,7 +3,7 @@
 A pipeline to process FHIR data through ETL processes and load into a PostgreSQL database.  
 
 
-### Prerequisites  
+## Prerequisites  
 
 Before running the pipeline, ensure that you have the following prerequisites installed on your system:
 
