@@ -2,12 +2,13 @@ import json
 import csv
 from io import StringIO
 
-from src.database.connect import DBConnection
+from src.database.connect import dbconnection
+from src.config import PSQL_CREDENTIALS
 
 # Changed data to format suitable for loading, then loads using COPY method from postgres
 def load_to_postgres(data: list):
     # Connect to database
-    with DBConnection() as conn:
+    with dbconnection(PSQL_CREDENTIALS) as conn:
         cursor = conn.cursor()
         try:
             # Group data by table name

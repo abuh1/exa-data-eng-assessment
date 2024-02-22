@@ -1,7 +1,8 @@
 import itertools
 import inflection
 
-from src.database.connect import DBConnection
+from src.database.connect import dbconnection
+from src.config import PSQL_CREDENTIALS
 
 # This function connects to a database with credentials inside 'config.ini' and transforms it into a suitable format for loading
 def transform_data(extracted_data):
@@ -39,7 +40,7 @@ def transform_data(extracted_data):
     filtered_resources = []
     # Grabs each dictionary's corresponding table column names from the database, and discards the items that aren't needed in the table.
     try: 
-        with DBConnection() as conn:
+        with dbconnection(PSQL_CREDENTIALS) as conn:
             for resource in resources_list:
                 # Get the name of the table that the current resource will fill
                 table_name = resource['resource_type']
